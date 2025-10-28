@@ -36,7 +36,10 @@ def main(page: ft.Page):
     lista_auto = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
 
     # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno, contatore posti)
-    # TODO
+    input_marca = ft.TextField(label="Marca", width=150)
+    input_modello = ft.TextField(label="Modello", width=150)
+    input_anno = ft.TextField(label="Anno", width=100)
+    input_posti = ft.TextField(label="Posti", width=100)
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_auto():
@@ -58,14 +61,40 @@ def main(page: ft.Page):
         page.update()
 
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
-    # TODO
+    def aggiungi_auto(e):
+        try:
+            marca = input_marca.value.strip()
+            modello = input_modello.value.strip()
+            anno = int(input_anno.value.strip())
+            posti = int(input_posti.value.strip())
+
+            if not marca or not modello:
+                raise ValueError("Marca e modello non possono essere vuoti.")
+            if anno < 1900 or anno > 2100:
+                raise ValueError("Anno non valido.")
+            if posti <= 0:
+                raise ValueError("Numero di posti non valido.")
+
+            autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
+            alert.show_alert("✅ Automobile aggiunta con successo!")
+
+            # Pulisce i campi dopo l'aggiunta
+            input_marca.value = ""
+            input_modello.value = ""
+            input_anno.value = ""
+            input_posti.value = ""
+            aggiorna_lista_auto()
+        except ValueError as ve:
+            alert.show_alert(f"⚠️ Errore nei dati: {ve}")
+        except Exception as ex:
+            alert.show_alert(f"❌ Errore: {ex}")
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
 
     # Bottoni per la gestione dell'inserimento di una nuova auto
-    # TODO
+    pulsante_aggiungi_auto = ft.ElevatedButton("Aggiungi Automobile", on_click=aggiungi_auto)
 
     # --- LAYOUT ---
     page.add(
@@ -83,7 +112,11 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        ft.Divider(),
+        ft.Text("Aggiungi Nuova Automobile", size=20),
+        ft.Row(spacing=10,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[input_marca,input_modello,input_anno,input_posti,pulsante_aggiungi_auto]),
 
         # Sezione 4
         ft.Divider(),
