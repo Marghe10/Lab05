@@ -36,7 +36,64 @@ def main(page: ft.Page):
     lista_strumenti = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
 
     # Tutti i TextField per le info necessarie per aggiungere un nuovo strumento (tipo, marca, anno, contatore posti)
-    # TODO
+    aggiungi_strumento_titolo=ft.Text("Aggiungi nuovo strumento", size=20)
+    row_aggiungi_strumento=ft.Row([aggiungi_strumento_titolo], alignment=ft.MainAxisAlignment.CENTER)
+
+    tipo=ft.TextField(label="tipo")
+    marca=ft.TextField(label="marca")
+    anno_acquisto=ft.TextField(label="anno acquisto")
+    contatore = ft.TextField(value="0", read_only=True, width=50, text_align=ft.TextAlign.CENTER,)
+
+    def incrementa_contatore():
+        contatore.value=str(int(contatore.value) + 1) #trasforma il numero dentro contatore in un intero, ci aggiunge uno e poi lo ritrasforma in una stringa
+
+    def decrementa_contatore():
+        contatore.value = str(int(contatore.value) - 1)
+
+    bottone_meno=ft.IconButton(icon=ft.Icons.REMOVE, on_click=decrementa_contatore)
+    bottone_piu = ft.IconButton(icon=ft.Icons.ADD, on_click=incrementa_contatore)
+    row_info_strumento=ft.Row([tipo, marca, anno_acquisto, bottone_meno, contatore, bottone_piu])
+
+    # Aggiungi un button "aggiungi strumento":
+    def aggiungi_strumento():
+        valore_tipo = (tipo.value or "").strip()
+        if valore_tipo == "":
+            alert.show_alert("Inserisci il tipo di strumento.")
+            return
+
+        valore_marca = (marca.value or "").strip()
+        if valore_marca == "":
+            alert.show_alert("Inserisci la marca dello strumento.")
+            return
+
+        valore_contatore=int(contatore.value)
+        if valore_contatore < 0:
+            alert.show_alert("Il prezzo dello strumento non puo essere minore di 0")
+
+        try:
+            valore_anno_acquisto = int(anno_acquisto.value)
+        except ValueError:
+            alert.show_alert("l'anno d'acquisto deve essere un numero intero")
+            return
+
+        try:
+            deposito.aggiungi_strumento(valore_tipo, valore_marca, valore_anno_acquisto, valore_contatore)
+        except ValueError:
+            alert.show_alert("c'è stato un errore nel tentativo di aggiunta dello strumento")
+
+        # svuota i campi
+        tipo.value = ""
+        marca.value = ""
+        anno_acquisto.value = ""
+        contatore.value = "0"
+
+        # aggiornare la lista di strumenti mostrata a schermo all'interno del contenitore ListView,
+        # uso la funzione gia implementata sotto
+        aggiorna_lista_strumenti()
+
+    bottone_aggiungi_strumento=ft.Button("aggiungi strumento", on_click=aggiungi_strumento)
+
+
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_strumenti():
@@ -63,6 +120,7 @@ def main(page: ft.Page):
 
     # Pulsanti per la gestione dell'inserimento di un nuovo strumento
     # TODO
+    # ho svolto tutto sopra
 
     # --- LAYOUT ---
     page.add(
@@ -80,7 +138,9 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        row_aggiungi_strumento,
+        row_info_strumento,
+        bottone_aggiungi_strumento,
 
         # Sezione 4
         ft.Divider(),
